@@ -1,0 +1,64 @@
+[
+  {
+    "name": "api",
+    "image": "${image}",
+    "portMappings": [
+      {
+        "containerPort": 80,
+        "hostPort": 80
+      }
+    ],
+    "memory": 300,
+    "networkMode": "awsvpc",
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${log_group}",
+        "awslogs-region": "us-east-1",
+        "awslogs-stream-prefix": "api"
+      }
+    },
+    "environment": [
+      {
+        "name": "DJANGO_DB_NAME",
+        "value": "${database_name}"
+      },
+      {
+        "name": "DJANGO_DB_USER",
+        "value": "${database_username}"
+      },
+      {
+        "name": "DJANGO_DB_PASSWORD",
+        "value": "${database_password}"
+      },
+      {
+        "name": "DJANGO_DB_HOST",
+        "value": "${database_host}"
+      },
+      {
+        "name": "DJANGO_DB_PORT",
+        "value": "5432"
+      },
+      {
+        "name": "DJANGO_SECRET_KEY",
+        "value": "${django_secret_key}"
+      },
+      {
+        "name": "PLAID_CLIENT_ID",
+        "value": "${plaid_client_id}"
+      },
+      {
+        "name": "PLAID_PUBLIC_KEY",
+        "value": "${plaid_public_key}"
+      },
+      {
+        "name": "PLAID_SECRET",
+        "value": "${plaid_secret}"
+      },
+      {
+        "name": "PLAID_ENV",
+        "value": "${plaid_env}"
+      }
+    ]
+  }
+]
