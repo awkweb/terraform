@@ -1,12 +1,4 @@
-variable "domain" {}
 variable "database_name" {}
 variable "database_username" {}
 variable "database_password" {}
-variable "django_secret_key" {}
-variable "plaid_client_id" {}
-variable "plaid_env" {}
-variable "plaid_public_key" {}
-variable "plaid_secret" {}
 variable "region" {}
-variable "ssl_certificate" {}
-variable "ssl_certificate_key" {}
