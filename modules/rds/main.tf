@@ -27,7 +27,7 @@ resource "aws_security_group" "db_access_sg" {
 
 resource "aws_security_group" "rds_sg" {
   name        = "${var.environment}-rds-sg"
-  description = "${var.environment} Security Group"
+  description = "${var.environment} security group"
   vpc_id      = "${var.vpc_id}"
 
   tags {
@@ -64,12 +64,13 @@ resource "aws_db_instance" "rds" {
   identifier             = "${var.environment}-database"
   allocated_storage      = "${var.allocated_storage}"
   engine                 = "postgres"
-  engine_version         = "9.6.6"
+  engine_version         = "9.6.9"
   instance_class         = "${var.instance_class}"
   multi_az               = "${var.multi_az}"
   name                   = "${var.database_name}"
   username               = "${var.database_username}"
   password               = "${var.database_password}"
+  skip_final_snapshot    = true
   db_subnet_group_name   = "${aws_db_subnet_group.rds_subnet_group.id}"
   vpc_security_group_ids = ["${aws_security_group.rds_sg.id}"]
 
