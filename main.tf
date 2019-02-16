@@ -18,8 +18,8 @@ module "networking" {
   source               = "./modules/networking"
   environment          = "production"
   vpc_cidr             = "10.0.0.0/16"
-  public_subnets_cidr  = ["10.0.1.0/24", "10.0.2.0/24"]
-  private_subnets_cidr = ["10.0.10.0/24", "10.0.20.0/24"]
+  public_subnets_cidr  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  private_subnets_cidr = ["10.0.10.0/24", "10.0.20.0/24", "10.0.30.0/24"]
   region               = "${var.region}"
   availability_zones   = "${local.production_availability_zones}"
   key_name             = "production_key"
@@ -35,4 +35,25 @@ module "rds" {
   subnet_ids        = ["${module.networking.private_subnets_id}"]
   vpc_id            = "${module.networking.vpc_id}"
   instance_class    = "db.t2.micro"
+}
+
+module "ecs" {
+  source             = "./modules/ecs"
+  environment        = "production"
+  vpc_id             = "${module.networking.vpc_id}"
+  availability_zones = "${local.production_availability_zones}"
+  subnets_ids        = ["${module.networking.private_subnets_id}"]
+  public_subnet_ids  = ["${module.networking.public_subnets_id}"]
+
+  security_groups_ids = [
+    "${module.networking.security_groups_ids}",
+    "${module.rds.db_access_sg_id}",
+  ]
+
+  database_endpoint   = "${module.rds.rds_address}"
+  database_name       = "${var.database_name}"
+  database_username   = "${var.database_username}"
+  database_password   = "${var.database_password}"
+  ssl_certificate     = "${var.ssl_certificate}"
+  ssl_certificate_key = "${var.ssl_certificate_key}"
 }

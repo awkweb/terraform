@@ -1,0 +1,38 @@
+[
+  {
+    "name": "nginx",
+    "cpu": 100,
+    "entrypoint": ["bash", "./etc/nginx/docker-entrypoint.sh"],
+    "environment": [
+      {
+        "name": "SSL_CERTIFICATE",
+        "value": "${ssl_certificate}"
+      },
+      {
+        "name": "SSL_CERTIFICATE_KEY",
+        "value": "${ssl_certificate_key}"
+      }
+    ],
+    "image": "${image}",
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${log_group}",
+        "awslogs-region": "us-east-1",
+        "awslogs-stream-prefix": "nginx"
+      }
+    },
+    "memory": 300,
+    "networkMode": "awsvpc",
+    "portMappings": [
+      {
+        "containerPort": 80,
+        "hostPort": 80
+      },
+      {
+        "containerPort": 443,
+        "hostPort": 443
+      }
+    ]
+  }
+]
