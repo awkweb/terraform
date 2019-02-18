@@ -8,4 +8,10 @@ variable "database_username" {}
 
 variable "database_password" {}
 
+variable "domain" {}
+
 variable "region" {}
+
+variable "ssl_certificate" {}
+
+variable "ssl_certificate_key" {}
