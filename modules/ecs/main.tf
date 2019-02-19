@@ -133,44 +133,17 @@ resource "aws_alb_listener" "wilbur" {
 /*
 * IAM service role
 */
-data "aws_iam_policy_document" "ecs_service_role" {
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["ecs.amazonaws.com"]
-    }
-  }
-}
 
 resource "aws_iam_role" "ecs_role" {
   name               = "ecs_role"
-  assume_role_policy = "${data.aws_iam_policy_document.ecs_service_role.json}"
-}
-
-data "aws_iam_policy_document" "ecs_service_policy" {
-  statement {
-    effect    = "Allow"
-    resources = ["*"]
-
-    actions = [
-      "elasticloadbalancing:Describe*",
-      "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
-      "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
-      "ec2:Describe*",
-      "ec2:AuthorizeSecurityGroupIngress",
-    ]
-  }
+  assume_role_policy = "${file("${path.module}/policies/ecs-service-role.json")}"
 }
 
 /* ecs service scheduler role */
 resource "aws_iam_role_policy" "ecs_service_role_policy" {
   name = "ecs_service_role_policy"
 
-  #policy = "${file("${path.module}/policies/ecs-service-role.json")}"
-  policy = "${data.aws_iam_policy_document.ecs_service_policy.json}"
+  policy = "${file("${path.module}/policies/ecs-service-role-policy.json")}"
   role   = "${aws_iam_role.ecs_role.id}"
 }
 
@@ -185,6 +158,19 @@ resource "aws_iam_role_policy" "ecs_execution_role_policy" {
 
   policy = "${file("${path.module}/policies/ecs-execution-role-policy.json")}"
   role   = "${aws_iam_role.ecs_execution_role.id}"
+}
+
+/* ecsInstanceRole https://docs.aws.amazon.com/AmazonECS/latest/developerguide/instance_IAM_role.html */
+resource "aws_iam_role" "ecs_instance_role" {
+  name               = "ecs_instance_role"
+  assume_role_policy = "${file("${path.module}/policies/ecs-instance-role.json")}"
+}
+
+resource "aws_iam_role_policy" "ecs_instance_role_policy" {
+  name = "ecs_instance_role_policy"
+
+  policy = "${file("${path.module}/policies/ecs-instance-role-policy.json")}"
+  role   = "${aws_iam_role.ecs_instance_role.id}"
 }
 
 /*====
