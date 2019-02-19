@@ -2,49 +2,58 @@
 Variables used across all modules
 ======*/
 locals {
-  production_availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  region             = "us-east-1"
+  availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 
+/*====
+AWS provider
+======*/
 provider "aws" {
   access_key = "${var.aws_access_key}"
   secret_key = "${var.aws_secret_key}"
-  region     = "${var.region}"
+  region     = "${local.region}"
   version    = "1.59"
 }
 
+/*====
+AWS resources
+======*/
 resource "aws_key_pair" "key" {
   key_name   = "wilbur"
   public_key = "${file("wilbur.pub")}"
 }
 
 module "networking" {
-  source               = "./modules/networking"
-  environment          = "production"
-  vpc_cidr             = "10.0.0.0/16"
-  public_subnets_cidr  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  private_subnets_cidr = ["10.0.10.0/24", "10.0.20.0/24", "10.0.30.0/24"]
-  region               = "${var.region}"
-  availability_zones   = "${local.production_availability_zones}"
-  key_name             = "wilbur"
+  source      = "./modules/networking"
+  environment = "production"
+  vpc_cidr    = "10.0.0.0/16"
+
+  availability_zones   = "${local.availability_zones}"
+  public_subnets_cidr  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+  private_subnets_cidr = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
 }
 
 module "rds" {
-  source            = "./modules/rds"
-  environment       = "production"
+  source      = "./modules/rds"
+  environment = "production"
+
   allocated_storage = "20"
   database_name     = "${var.database_name}"
   database_password = "${var.database_password}"
   database_username = "${var.database_username}"
   instance_class    = "db.t2.micro"
-  subnet_ids        = ["${module.networking.private_subnets_id}"]
-  vpc_id            = "${module.networking.vpc_id}"
+
+  subnet_ids = ["${module.networking.private_subnets_id}"]
+  vpc_id     = "${module.networking.vpc_id}"
 }
 
 module "ecs" {
-  source             = "./modules/ecs"
-  environment        = "production"
+  source      = "./modules/ecs"
+  environment = "production"
+
   vpc_id             = "${module.networking.vpc_id}"
-  availability_zones = "${local.production_availability_zones}"
+  availability_zones = "${local.availability_zones}"
   subnets_ids        = ["${module.networking.private_subnets_id}"]
   public_subnet_ids  = ["${module.networking.public_subnets_id}"]
 
@@ -53,7 +62,7 @@ module "ecs" {
     "${module.rds.db_access_sg_id}",
   ]
 
-  database_endpoint   = "${module.rds.rds_address}"
+  key_name            = "${aws_key_pair.key.key_name}"
   database_name       = "${var.database_name}"
   database_username   = "${var.database_username}"
   database_password   = "${var.database_password}"

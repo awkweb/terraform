@@ -20,6 +20,8 @@ variable "public_subnet_ids" {
   description = "Public subnets to use"
 }
 
+variable "key_name" {}
+
 variable "database_endpoint" {}
 
 variable "database_username" {}

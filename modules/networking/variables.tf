@@ -1,17 +1,8 @@
 variable "availability_zones" {
-  type        = "list"
-  description = "AZ resources will be launched"
+  type = "list"
 }
 
 variable "environment" {}
-
-variable "key_name" {
-  description = "Public key for bastion host"
-}
-
-variable "region" {
-  description = "Region to launch bastion host"
-}
 
 variable "vpc_cidr" {
   description = "CIDR block of VPC"
