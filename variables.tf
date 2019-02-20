@@ -1,3 +1,11 @@
+variable "name" {
+  default = "wilbur"
+}
+
+variable "environment" {
+  default = "prod"
+}
+
 variable "aws_access_key" {}
 
 variable "aws_secret_key" {}

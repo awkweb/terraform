@@ -1,79 +1,80 @@
-/*====
-Cloudwatch Log Group
-======*/
-resource "aws_cloudwatch_log_group" "wilbur" {
-  name = "wilbur"
+/*========================================
+ECS cluster & alb
+========================================*/
+module "ecs_cluster" {
+  source = "./modules/cluster"
 
-  tags {
+  name                = "${var.name}-${var.environment}"
+  security_groups_ids = ["${var.security_groups_ids}"]
+  vpc_id              = "${var.vpc_id}"
+  vpc_subnets         = ["${var.subnets_ids}"]
+
+  tags = {
     Environment = "${var.environment}"
-    Application = "Wilbur"
+    Application = "${var.name}"
   }
 }
 
-/*====
-ECR repositories
-======*/
-resource "aws_ecr_repository" "nginx" {
-  name = "nginx"
-}
+module "alb" {
+  source = "./modules/alb"
 
-resource "aws_ecr_lifecycle_policy" "policy" {
-  repository = "${aws_ecr_repository.nginx.name}"
-  policy     = "${file("${path.module}/policies/ecr-lifecycle-policy.json")}"
-}
+  name            = "${var.name}-${var.environment}"
+  certificate_arn = "arn:aws:acm:us-east-1:102953801091:certificate/fc732d70-d39a-43e5-97c4-3438b2ed9c47"
+  backend_sg_id   = "${module.ecs_cluster.instance_sg_id}"
 
-/*====
-ECS cluster
-======*/
-resource "aws_ecs_cluster" "cluster" {
-  name = "${var.environment}-ecs-cluster"
-}
-
-/*====
-Launch Configuration & Auto Scaling Group
-from https://blog.ulysse.io/post/setting-up-ecs-with-terraform/
-======*/
-data "aws_ami" "ecs_optimized" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["amzn-ami-*-amazon-ecs-optimized"]
+  tags = {
+    Environment = "${var.environment}"
+    Application = "${var.name}"
   }
 
-  owners = ["amazon"]
+  vpc_id      = "${var.vpc_id}"
+  vpc_subnets = ["${var.public_subnet_ids}"]
 }
 
-resource "aws_iam_instance_profile" "ecs_agent" {
-  name = "ecs-agent"
-  role = "${aws_iam_role.docker_cluster_instance_role.name}"
-}
+/*========================================
+ECS task definition & service
+========================================*/
+resource "aws_ecs_task_definition" "app" {
+  family = "${var.name}-${var.environment}"
 
-data "template_file" "user_data" {
-  template = "${file("${path.module}/data/user_data.sh")}"
-
-  vars {
-    ecs_cluster = "${aws_ecs_cluster.cluster.name}"
+  container_definitions = <<EOF
+[
+  {
+    "name": "nginx",
+    "image": "nginx:1.13-alpine",
+    "essential": true,
+    "portMappings": [
+      {
+        "containerPort": 80
+      }
+    ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "app-dev-nginx",
+        "awslogs-region": "us-east-1"
+      }
+    },
+    "memory": 128,
+    "cpu": 100
   }
+]
+EOF
 }
 
-resource "aws_launch_configuration" "instance" {
-  name                 = "${var.environment}"
-  image_id             = "${data.aws_ami.ecs_optimized.id}"
-  iam_instance_profile = "${aws_iam_instance_profile.ecs_agent.name}"
-  security_groups      = ["${var.security_groups_ids}"]
-  user_data            = "${data.template_file.user_data.rendered}"
-  key_name             = "${var.key_name}"
+module "ecs_service_app" {
+  source = "./modules/service"
 
-  instance_type = "t2.micro"
-}
+  name                 = "${var.name}-${var.environment}"
+  alb_target_group_arn = "${module.alb.target_group_arn}"
+  cluster              = "${module.ecs_cluster.cluster_id}"
+  container_name       = "nginx"
+  container_port       = "80"
+  log_groups           = ["${var.name}-${var.environment}-nginx"]
+  task_definition_arn  = "${aws_ecs_task_definition.app.arn}"
 
-resource "aws_autoscaling_group" "autoscaling_group" {
-  name                 = "${var.environment}"
-  vpc_zone_identifier  = ["${var.subnets_ids}"]
-  launch_configuration = "${aws_launch_configration.instance.name}"
-
-  desired_capacity = 3
-  min_size         = 3
-  max_size         = 3
+  tags = {
+    Environment = "${var.environment}"
+    Application = "${var.name}"
+  }
 }

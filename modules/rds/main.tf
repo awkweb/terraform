@@ -1,38 +1,41 @@
-/*====
+/*========================================
 RDS
-======*/
+========================================*/
 
 /* subnet used by rds */
 resource "aws_db_subnet_group" "rds_subnet_group" {
-  name        = "${var.environment}-rds-subnet-group"
+  name        = "${var.name}-rds-subnet-group"
   description = "RDS subnet group"
   subnet_ids  = ["${var.subnet_ids}"]
 
   tags {
     Environment = "${var.environment}"
+    Application = "${var.name}"
   }
 }
 
 /* Security Group for resources that want to access the Database */
 resource "aws_security_group" "db_access_sg" {
   vpc_id      = "${var.vpc_id}"
-  name        = "${var.environment}-db-access-sg"
+  name        = "${var.name}-db-access-sg"
   description = "Allow access to RDS"
 
   tags {
-    Name        = "${var.environment}-db-access-sg"
+    Name        = "${var.name}-db-access-sg"
     Environment = "${var.environment}"
+    Application = "${var.name}"
   }
 }
 
 resource "aws_security_group" "rds_sg" {
-  name        = "${var.environment}-rds-sg"
+  name        = "${var.name}-rds-sg"
   description = "${var.environment} security group"
   vpc_id      = "${var.vpc_id}"
 
   tags {
-    Name        = "${var.environment}-rds-sg"
+    Name        = "${var.name}-rds-sg"
     Environment = "${var.environment}"
+    Application = "${var.name}"
   }
 
   // allows traffic from the SG itself
@@ -76,5 +79,6 @@ resource "aws_db_instance" "rds" {
 
   tags {
     Environment = "${var.environment}"
+    Application = "${var.name}"
   }
 }

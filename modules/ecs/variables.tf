@@ -1,3 +1,5 @@
+variable "name" {}
+
 variable "environment" {}
 
 variable "vpc_id" {}
@@ -19,8 +21,6 @@ variable "public_subnet_ids" {
   type        = "list"
   description = "Public subnets to use"
 }
-
-variable "key_name" {}
 
 variable "database_endpoint" {}
 

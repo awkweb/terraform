@@ -2,6 +2,8 @@ variable "availability_zones" {
   type = "list"
 }
 
+variable "name" {}
+
 variable "environment" {}
 
 variable "vpc_cidr" {
