@@ -2,26 +2,6 @@ resource "aws_ecs_cluster" "instance" {
   name = "${var.name}"
 }
 
-data "aws_iam_policy_document" "instance_policy" {
-  statement {
-    sid = "CloudwatchPutMetricData"
-
-    actions = [
-      "cloudwatch:PutMetricData",
-    ]
-
-    resources = [
-      "*",
-    ]
-  }
-}
-
-resource "aws_iam_policy" "instance_policy" {
-  name   = "${var.name}-ecs-instance"
-  path   = "/"
-  policy = "${data.aws_iam_policy_document.instance_policy.json}"
-}
-
 resource "aws_iam_role" "instance" {
   name = "${var.name}-instance-role"
 
@@ -41,14 +21,14 @@ resource "aws_iam_role" "instance" {
 EOF
 }
 
+resource "aws_iam_role_policy_attachment" "ssm_policy" {
+  role       = "${aws_iam_role.instance.name}"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+}
+
 resource "aws_iam_role_policy_attachment" "ecs_policy" {
   role       = "${aws_iam_role.instance.name}"
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
-}
-
-resource "aws_iam_role_policy_attachment" "instance_policy" {
-  role       = "${aws_iam_role.instance.name}"
-  policy_arn = "${aws_iam_policy.instance_policy.arn}"
 }
 
 resource "aws_iam_instance_profile" "instance" {

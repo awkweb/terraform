@@ -26,11 +26,6 @@ variable "security_groups_ids" {
   type = "list"
 }
 
-variable "tags" {
-  description = "A map of tags to add to all resources"
-  default     = {}
-}
-
 variable "vpc_id" {
   description = "VPC ID to create cluster in"
 }

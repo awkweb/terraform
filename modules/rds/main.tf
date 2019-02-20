@@ -1,17 +1,8 @@
-/*========================================
-RDS
-========================================*/
-
 /* subnet used by rds */
 resource "aws_db_subnet_group" "rds_subnet_group" {
   name        = "${var.name}-rds-subnet-group"
   description = "RDS subnet group"
   subnet_ids  = ["${var.subnet_ids}"]
-
-  tags {
-    Environment = "${var.environment}"
-    Application = "${var.name}"
-  }
 }
 
 /* Security Group for resources that want to access the Database */
@@ -19,24 +10,12 @@ resource "aws_security_group" "db_access_sg" {
   vpc_id      = "${var.vpc_id}"
   name        = "${var.name}-db-access-sg"
   description = "Allow access to RDS"
-
-  tags {
-    Name        = "${var.name}-db-access-sg"
-    Environment = "${var.environment}"
-    Application = "${var.name}"
-  }
 }
 
 resource "aws_security_group" "rds_sg" {
   name        = "${var.name}-rds-sg"
-  description = "${var.environment} security group"
+  description = "${var.name} security group"
   vpc_id      = "${var.vpc_id}"
-
-  tags {
-    Name        = "${var.name}-rds-sg"
-    Environment = "${var.environment}"
-    Application = "${var.name}"
-  }
 
   // allows traffic from the SG itself
   ingress {
@@ -64,7 +43,7 @@ resource "aws_security_group" "rds_sg" {
 }
 
 resource "aws_db_instance" "rds" {
-  identifier             = "${var.environment}-database"
+  identifier             = "${var.name}-database"
   allocated_storage      = "${var.allocated_storage}"
   engine                 = "postgres"
   engine_version         = "9.6.9"
@@ -76,9 +55,4 @@ resource "aws_db_instance" "rds" {
   skip_final_snapshot    = true
   db_subnet_group_name   = "${aws_db_subnet_group.rds_subnet_group.id}"
   vpc_security_group_ids = ["${aws_security_group.rds_sg.id}"]
-
-  tags {
-    Environment = "${var.environment}"
-    Application = "${var.name}"
-  }
 }

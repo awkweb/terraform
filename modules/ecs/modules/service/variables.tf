@@ -1,8 +1,8 @@
-variable "alb_target_group_arn" {
+variable "lb_target_group_arn" {
   description = "ARN of the ALB target group that should be associated with the ECS service"
 }
 
-variable "cluster" {
+variable "cluster_name" {
   description = "Name of the ECS cluster to create service in"
 }
 
@@ -12,17 +12,6 @@ variable "container_name" {
 
 variable "container_port" {
   description = "port the container is listening on"
-  default     = 80
-}
-
-variable "deployment_maximum_percent" {
-  description = "The maximum percent of desired tasks that are allowed during a deployment"
-  default     = 200
-}
-
-variable "deployment_minimum_healthy_percent" {
-  description = "The minimum percent of desired tasks that must remain healthy during a deplyment"
-  default     = 100
 }
 
 variable "desired_count" {
@@ -30,21 +19,15 @@ variable "desired_count" {
   default     = 1
 }
 
-variable "log_groups" {
-  description = "Log groups that will be created in CloudWatch Logs"
-  default     = []
-}
-
 variable "name" {
   description = "Name of the ecs service"
-  default     = "svc"
 }
 
-variable "tags" {
-  description = "A map of tags to add to all resources"
-  default     = {}
+variable "security_groups_ids" {
+  type = "list"
 }
 
-variable "task_definition_arn" {
-  description = "ARN of the task defintion for the ECS service"
+variable "vpc_subnets" {
+  description = "List of subnets to put instances in"
+  default     = []
 }

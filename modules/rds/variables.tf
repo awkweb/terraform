@@ -1,7 +1,5 @@
 variable "name" {}
 
-variable "environment" {}
-
 variable "subnet_ids" {
   type        = "list"
   description = "Subnet ids"

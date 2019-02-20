@@ -1,53 +1,61 @@
-resource "aws_security_group_rule" "instance_in_alb" {
-  type                     = "ingress"
-  from_port                = 32768
-  to_port                  = 61000
-  protocol                 = "tcp"
-  source_security_group_id = "${module.alb_sg_https.this_security_group_id}"
-  security_group_id        = "${var.backend_sg_id}"
-}
-
-module "alb_sg_https" {
-  source  = "terraform-aws-modules/security-group/aws"
-  version = "2.14.0"
-
-  name   = "${var.name}-alb"
+resource "aws_security_group" "instance" {
+  name   = "${var.name}-inbound-sg"
   vpc_id = "${var.vpc_id}"
 
-  ingress_with_cidr_blocks = [
-    {
-      rule        = "https-443-tcp"
-      cidr_blocks = "0.0.0.0/0"
-    },
-  ]
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-  egress_with_cidr_blocks = [
-    {
-      rule        = "all-tcp"
-      cidr_blocks = "0.0.0.0/0"
-    },
-  ]
+  ingress {
+    from_port   = 8
+    to_port     = 0
+    protocol    = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-  tags = "${var.tags}"
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
-module "alb" {
-  source  = "terraform-aws-modules/alb/aws"
-  version = "3.5.0"
+resource "aws_alb" "instance" {
+  name            = "${var.name}-alb"
+  subnets         = ["${var.vpc_subnets}"]
+  security_groups = ["${var.security_groups_ids}", "${aws_security_group.instance.id}"]
+}
 
-  load_balancer_name = "${var.name}"
-  security_groups    = ["${module.alb_sg_https.this_security_group_id}"]
+resource "aws_alb_target_group" "instance" {
+  name = "${var.name}-alb-target-group"
 
-  http_tcp_listeners       = "${list(map("port", "${var.backend_port}", "protocol", "${var.backend_protocol}"))}"
-  http_tcp_listeners_count = "1"
-  https_listeners          = "${list(map("certificate_arn", "${var.certificate_arn}", "port", 443))}"
-  https_listeners_count    = "1"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = "${var.vpc_id}"
 
-  logging_enabled = false
+  # target_type = "ip"
 
-  subnets             = ["${var.vpc_subnets}"]
-  tags                = "${var.tags}"
-  target_groups       = "${list(map("name", "${var.name}", "backend_protocol", "${var.backend_protocol}", "backend_port", "${var.backend_port}"))}"
-  target_groups_count = "1"
-  vpc_id              = "${var.vpc_id}"
+  lifecycle {
+    create_before_destroy = true
+  }
+  depends_on = ["aws_alb.instance"]
+}
+
+resource "aws_alb_listener" "instance" {
+  load_balancer_arn = "${aws_alb.instance.arn}"
+  port              = "443"
+  protocol          = "HTTPS"
+
+  certificate_arn = "${var.certificate_arn}"
+
+  depends_on = ["aws_alb_target_group.instance"]
+
+  default_action {
+    target_group_arn = "${aws_alb_target_group.instance.arn}"
+    type             = "forward"
+  }
 }

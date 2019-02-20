@@ -1,9 +1,15 @@
-output "listener_https_arn" {
-  description = "The ARN of the HTTPS ALB Listener that can be used to add rules"
-  value       = "${module.alb.https_listener_arns}"
+output "lb_zone_id" {
+  value = "${aws_alb.instance.zone_id}"
 }
 
-output "target_group_arn" {
-  description = "ARN of the target group"
-  value       = "${module.alb.target_group_arns}"
+output "lb_dns_name" {
+  value = "${aws_alb.instance.dns_name}"
+}
+
+output "lb_security_group_id" {
+  value = "${aws_security_group.instance.id}"
+}
+
+output "lb_target_group_arn" {
+  value = "${aws_alb_target_group.instance.arn}"
 }

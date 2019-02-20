@@ -4,8 +4,6 @@ variable "availability_zones" {
 
 variable "name" {}
 
-variable "environment" {}
-
 variable "vpc_cidr" {
   description = "CIDR block of VPC"
 }

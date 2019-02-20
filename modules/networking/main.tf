@@ -6,12 +6,6 @@ resource "aws_vpc" "vpc" {
   cidr_block           = "${var.vpc_cidr}"
   enable_dns_hostnames = true
   enable_dns_support   = true
-
-  tags = {
-    Name        = "${var.name}-vpc"
-    Environment = "${var.environment}"
-    Application = "${var.name}"
-  }
 }
 
 /*========================================
@@ -20,12 +14,6 @@ Subnets
 /* Internet gateway for the public subnet */
 resource "aws_internet_gateway" "ig" {
   vpc_id = "${aws_vpc.vpc.id}"
-
-  tags {
-    Name        = "${var.name}-igw"
-    Environment = "${var.environment}"
-    Application = "${var.name}"
-  }
 }
 
 /* Elastic IP for NAT */
@@ -39,12 +27,6 @@ resource "aws_nat_gateway" "nat" {
   allocation_id = "${aws_eip.nat_eip.id}"
   subnet_id     = "${element(aws_subnet.public_subnet.*.id, 0)}"
   depends_on    = ["aws_internet_gateway.ig"]
-
-  tags {
-    Name        = "${var.name}-${element(var.availability_zones, count.index)}-nat"
-    Environment = "${var.environment}"
-    Application = "${var.name}"
-  }
 }
 
 /* Public subnet */
@@ -54,12 +36,6 @@ resource "aws_subnet" "public_subnet" {
   cidr_block              = "${element(var.public_subnets_cidr, count.index)}"
   availability_zone       = "${element(var.availability_zones, count.index)}"
   map_public_ip_on_launch = true
-
-  tags {
-    Name        = "${var.name}-${element(var.availability_zones, count.index)}-public-subnet"
-    Environment = "${var.environment}"
-    Application = "${var.name}"
-  }
 }
 
 /* Private subnet */
@@ -69,34 +45,16 @@ resource "aws_subnet" "private_subnet" {
   cidr_block              = "${element(var.private_subnets_cidr, count.index)}"
   availability_zone       = "${element(var.availability_zones, count.index)}"
   map_public_ip_on_launch = false
-
-  tags {
-    Name        = "${var.name}-${element(var.availability_zones, count.index)}-private-subnet"
-    Environment = "${var.environment}"
-    Application = "${var.name}"
-  }
 }
 
 /* Routing table for private subnet */
 resource "aws_route_table" "private" {
   vpc_id = "${aws_vpc.vpc.id}"
-
-  tags {
-    Name        = "${var.name}-private-route-table"
-    Environment = "${var.environment}"
-    Application = "${var.name}"
-  }
 }
 
 /* Routing table for public subnet */
 resource "aws_route_table" "public" {
   vpc_id = "${aws_vpc.vpc.id}"
-
-  tags {
-    Name        = "${var.name}-public-route-table"
-    Environment = "${var.environment}"
-    Application = "${var.name}"
-  }
 }
 
 resource "aws_route" "public_internet_gateway" {
@@ -128,10 +86,17 @@ resource "aws_route_table_association" "private" {
 VPC's Default Security Group
 ========================================*/
 resource "aws_security_group" "default" {
-  name        = "${var.environment}-default-sg"
+  name        = "${var.name}-default-sg"
   description = "Default security group to allow inbound/outbound from the VPC"
   vpc_id      = "${aws_vpc.vpc.id}"
   depends_on  = ["aws_vpc.vpc"]
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   ingress {
     from_port = "0"
@@ -145,11 +110,5 @@ resource "aws_security_group" "default" {
     to_port   = "0"
     protocol  = "-1"
     self      = "true"
-  }
-
-  tags {
-    Name        = "${var.name}-sg"
-    Environment = "${var.environment}"
-    Application = "${var.name}"
   }
 }
