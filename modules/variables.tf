@@ -15,8 +15,6 @@ variable "availability_zones" {
   default = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 
-variable "certificate_arn" {}
-
 variable "instance_type" {
   default = "t2.micro"
 }
@@ -33,6 +31,10 @@ variable "public_subnets_cidr" {
 variable "private_subnets_cidr" {
   type    = "list"
   default = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+}
+
+variable "route53_zone" {
+  default = "wilbur.app"
 }
 
 variable "vpc_cidr" {

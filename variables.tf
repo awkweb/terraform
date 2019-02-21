@@ -2,8 +2,6 @@ variable "aws_access_key" {}
 
 variable "aws_secret_key" {}
 
-variable "certificate_arn" {}
-
 variable "database_name" {}
 
 variable "database_username" {}
