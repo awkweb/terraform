@@ -1,7 +1,10 @@
 [
   {
     "name": "nginx",
-    "image": "nginx:1.13-alpine",
+    "image": "nginx:alpine",
+    "cpu": 200,
+    "memory": 200,
+    "essential": true,
     "portMappings": [
       {
         "containerPort": 80,
@@ -15,8 +18,6 @@
         "awslogs-region": "us-east-1",
         "awslogs-stream-prefix": "nginx"
       }
-    },
-    "memory": 300,
-    "cpu": 100
+    }
   }
 ]
