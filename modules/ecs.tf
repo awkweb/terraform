@@ -6,14 +6,6 @@ resource "aws_ecs_cluster" "instance" {
   name = "${var.name}"
 }
 
-data "template_file" "api_container_definition" {
-  template = "${file("files/task-definitions/api.json")}"
-
-  vars {
-    log_group = "${aws_cloudwatch_log_group.instance.name}"
-  }
-}
-
 resource "aws_ecs_task_definition" "api" {
   family                = "${var.name}-api"
   container_definitions = "${data.template_file.api_container_definition.rendered}"

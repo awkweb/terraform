@@ -15,6 +15,24 @@ variable "availability_zones" {
   default = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 
+variable "database_name" {}
+
+variable "database_username" {}
+
+variable "database_password" {}
+
+variable "database_allocated_storage" {
+  default = "20"
+}
+
+variable "database_multi_az" {
+  default = false
+}
+
+variable "database_instance_class" {
+  default = "db.t2.micro"
+}
+
 variable "instance_type" {
   default = "t2.micro"
 }
