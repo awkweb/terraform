@@ -15,6 +15,10 @@ variable "availability_zones" {
   default = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 
+variable "env" {
+  default = "prod"
+}
+
 variable "database_name" {}
 
 variable "database_username" {}
@@ -33,6 +37,10 @@ variable "database_instance_class" {
   default = "db.t2.micro"
 }
 
+variable "django_env" {}
+
+variable "django_secret_key" {}
+
 variable "instance_type" {
   default = "t2.micro"
 }
@@ -40,6 +48,14 @@ variable "instance_type" {
 variable "name" {
   default = "wilbur"
 }
+
+variable "plaid_client_id" {}
+
+variable "plaid_env" {}
+
+variable "plaid_public_key" {}
+
+variable "plaid_secret" {}
 
 variable "public_subnets_cidr" {
   type    = "list"
@@ -49,6 +65,10 @@ variable "public_subnets_cidr" {
 variable "private_subnets_cidr" {
   type    = "list"
   default = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+}
+
+variable "region" {
+  default = "us-east-1"
 }
 
 variable "route53_zone" {

@@ -1,11 +1,11 @@
 resource "aws_db_subnet_group" "rds" {
-  name        = "${var.name}-rds-subnet-group"
+  name        = "${var.name}-${var.env}-rds-sg"
   description = "RDS subnet group"
   subnet_ids  = ["${aws_subnet.private.*.id}"]
 }
 
 resource "aws_db_instance" "instance" {
-  identifier        = "${var.name}"
+  identifier        = "${var.name}-${var.env}"
   allocated_storage = "${var.database_allocated_storage}"
   engine            = "postgres"
   engine_version    = "9.6.9"
@@ -18,5 +18,6 @@ resource "aws_db_instance" "instance" {
 
   vpc_security_group_ids    = ["${aws_security_group.rds.id}"]
   db_subnet_group_name      = "${aws_db_subnet_group.rds.id}"
-  final_snapshot_identifier = "${var.name}-final"
+  skip_final_snapshot       = true
+  final_snapshot_identifier = "${var.name}-${var.env}-final"
 }

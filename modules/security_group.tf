@@ -1,7 +1,15 @@
 resource "aws_security_group" "api" {
-  name        = "${var.name}-api"
+  name        = "${var.name}-${var.env}-api"
   description = "security group for api"
   vpc_id      = "${aws_vpc.instance.id}"
+
+  # SSH access
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   # HTTP access from anywhere
   ingress {
@@ -20,7 +28,7 @@ resource "aws_security_group" "api" {
 }
 
 resource "aws_security_group" "alb" {
-  name        = "${var.name}-alb"
+  name        = "${var.name}-${var.env}-alb"
   description = "security group for alb"
   vpc_id      = "${aws_vpc.instance.id}"
 
@@ -47,13 +55,13 @@ resource "aws_security_group" "alb" {
 }
 
 resource "aws_security_group" "db_access" {
-  name        = "${var.name}-db-access"
+  name        = "${var.name}-${var.env}-db-access"
   description = "security group for db access"
   vpc_id      = "${aws_vpc.instance.id}"
 }
 
 resource "aws_security_group" "rds" {
-  name        = "${var.name}-rds"
+  name        = "${var.name}-${var.env}-rds"
   description = "security group for rds"
   vpc_id      = "${aws_vpc.instance.id}"
 

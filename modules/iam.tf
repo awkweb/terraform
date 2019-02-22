@@ -1,5 +1,5 @@
 resource "aws_iam_role" "ec2" {
-  name = "${var.name}_instance_role"
+  name = "${var.name}-${var.env}-ec2-instance-role"
 
   assume_role_policy = <<EOF
 {
@@ -28,12 +28,12 @@ resource "aws_iam_role_policy_attachment" "ec2_container" {
 }
 
 resource "aws_iam_instance_profile" "ec2" {
-  name = "${var.name}_instance_profile"
+  name = "${var.name}-${var.env}-instance-profile"
   role = "${aws_iam_role.ec2.name}"
 }
 
 resource "aws_iam_role" "ecs" {
-  name = "ecs-service-role"
+  name = "${var.name}-${var.env}-ecs-service-role"
 
   assume_role_policy = <<EOF
 {
