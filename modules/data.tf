@@ -17,6 +17,17 @@ data "aws_ami" "ecs_optimized" {
   owners = ["amazon"]
 }
 
+data "aws_ami" "bastion" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["amzn-ami-hvm-*"]
+  }
+
+  owners = ["amazon"]
+}
+
 data "aws_route53_zone" "instance" {
   name = "wilbur.app."
 }
@@ -25,29 +36,41 @@ data "template_file" "api_container_definition" {
   template = "${file("files/task-definitions/api.json")}"
 
   vars {
-    /* api_image         = "${data.aws_ecr_repository.api.repository_url}" */
-    api_image         = "102953801091.dkr.ecr.us-east-1.amazonaws.com/wilbur-prod/api:0aade9ec0a0a02f4e248502483894e48fc1c8889"
-    database_host     = "${aws_db_instance.instance.address}"
-    database_name     = "${var.database_name}"
-    database_password = "${var.database_password}"
-    database_username = "${var.database_username}"
-    django_env        = "${var.django_env}"
-    django_secret_key = "${var.django_secret_key}"
-    log_group         = "${aws_cloudwatch_log_group.instance.name}"
-    plaid_client_id   = "${var.plaid_client_id}"
-    plaid_env         = "${var.plaid_env}"
-    plaid_public_key  = "${var.plaid_public_key}"
-    plaid_secret      = "${var.plaid_secret}"
-    region            = "${var.region}"
+    log_group = "${aws_cloudwatch_log_group.instance.name}"
   }
 }
+
+# data "template_file" "api_container_definition" {
+#   template = "${file("files/task-definitions/api.json")}"
+
+#   vars {
+#     /* api_image         = "${data.aws_ecr_repository.api.repository_url}" */
+#     api_image         = "102953801091.dkr.ecr.us-east-1.amazonaws.com/wilbur-prod/api:0aade9ec0a0a02f4e248502483894e48fc1c8889"
+#     database_host     = "${aws_db_instance.instance.address}"
+#     database_name     = "${var.database_name}"
+#     database_password = "${var.database_password}"
+#     database_username = "${var.database_username}"
+#     django_env        = "${var.django_env}"
+#     django_secret_key = "${var.django_secret_key}"
+#     log_group         = "${aws_cloudwatch_log_group.instance.name}"
+#     plaid_client_id   = "${var.plaid_client_id}"
+#     plaid_env         = "${var.plaid_env}"
+#     plaid_public_key  = "${var.plaid_public_key}"
+#     plaid_secret      = "${var.plaid_secret}"
+#     region            = "${var.region}"
+#   }
+# }
 
 data "template_file" "nginx_conf" {
   template = "${file("files/nginx.conf")}"
 }
 
-data "template_file" "user_data" {
-  template = "${file("files/user_data.sh")}"
+data "template_file" "user_data_bastion" {
+  template = "${file("files/user-data/bastion.sh")}"
+}
+
+data "template_file" "user_data_ecs" {
+  template = "${file("files/user-data/ecs.sh")}"
 
   vars {
     ecs_cluster = "${aws_ecs_cluster.instance.name}"
