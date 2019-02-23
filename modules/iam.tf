@@ -27,6 +27,11 @@ resource "aws_iam_role_policy_attachment" "ec2_container" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
+resource "aws_iam_role_policy_attachment" "s3_access" {
+  role       = "${aws_iam_role.ec2.name}"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+}
+
 resource "aws_iam_instance_profile" "ec2" {
   name = "${var.name}-${var.env}-instance-profile"
   role = "${aws_iam_role.ec2.name}"
