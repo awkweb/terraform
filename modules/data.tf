@@ -26,7 +26,7 @@ data "template_file" "api_container_definition" {
 
   vars {
     /* api_image         = "${data.aws_ecr_repository.api.repository_url}" */
-    api_image         = "102953801091.dkr.ecr.us-east-1.amazonaws.com/wilbur-prod/api:27baee6aa6f0e56c8660dd4595ef7c8919e943a8"
+    api_image         = "102953801091.dkr.ecr.us-east-1.amazonaws.com/wilbur-prod/api:0aade9ec0a0a02f4e248502483894e48fc1c8889"
     database_host     = "${aws_db_instance.instance.address}"
     database_name     = "${var.database_name}"
     database_password = "${var.database_password}"

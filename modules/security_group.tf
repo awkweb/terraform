@@ -11,7 +11,6 @@ resource "aws_security_group" "api" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # HTTP access from anywhere
   ingress {
     from_port   = 80
     to_port     = 80
@@ -32,6 +31,7 @@ resource "aws_security_group" "alb" {
   description = "security group for alb"
   vpc_id      = "${aws_vpc.instance.id}"
 
+  # HTTP access from anywhere
   ingress {
     from_port   = 80
     to_port     = 80
