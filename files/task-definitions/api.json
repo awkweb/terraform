@@ -1,5 +1,74 @@
 [
   {
+    "name": "api",
+    "image": "${api_image}",
+    "entryPoint": ["bash", "./docker-entrypoint.sh"],
+    "cpu": 200,
+    "memory": 200,
+    "essential": true,
+    "portMappings": [
+      {
+        "hostPort": 8000,
+        "protocol": "tcp",
+        "containerPort": 8000
+      }
+    ],
+    "environment": [
+      {
+        "name": "DJANGO_DB_NAME",
+        "value": "${database_name}"
+      },
+      {
+        "name": "DJANGO_DB_USER",
+        "value": "${database_username}"
+      },
+      {
+        "name": "DJANGO_DB_PASSWORD",
+        "value": "${database_password}"
+      },
+      {
+        "name": "DJANGO_DB_HOST",
+        "value": "${database_host}"
+      },
+      {
+        "name": "DJANGO_DB_PORT",
+        "value": "5432"
+      },
+      {
+        "name": "DJANGO_ENV",
+        "value": "${django_env}"
+      },
+      {
+        "name": "DJANGO_SECRET_KEY",
+        "value": "${django_secret_key}"
+      },
+      {
+        "name": "PLAID_CLIENT_ID",
+        "value": "${plaid_client_id}"
+      },
+      {
+        "name": "PLAID_PUBLIC_KEY",
+        "value": "${plaid_public_key}"
+      },
+      {
+        "name": "PLAID_SECRET",
+        "value": "${plaid_secret}"
+      },
+      {
+        "name": "PLAID_ENV",
+        "value": "${plaid_env}"
+      }
+    ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${log_group}",
+        "awslogs-region": "${region}",
+        "awslogs-stream-prefix": "api"
+      }
+    }
+  },
+  {
     "name": "nginx",
     "image": "nginx:alpine",
     "cpu": 200,
@@ -11,13 +80,26 @@
         "hostPort": 80
       }
     ],
+    "mountPoints": [
+      {
+        "sourceVolume": "nginx_conf",
+        "containerPath": "/etc/nginx/nginx.conf",
+        "readOnly": false
+      }
+    ],
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
         "awslogs-group": "${log_group}",
-        "awslogs-region": "us-east-1",
+        "awslogs-region": "${region}",
         "awslogs-stream-prefix": "nginx"
       }
-    }
+    },
+    "volumesFrom": [
+      {
+        "sourceContainer": "api",
+        "readOnly": false
+      }
+    ]
   }
 ]

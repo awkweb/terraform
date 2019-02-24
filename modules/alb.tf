@@ -12,7 +12,7 @@ resource "aws_alb_target_group" "instance" {
   vpc_id   = "${aws_vpc.instance.id}"
 
   health_check {
-    path = "/"
+    path = "/v1/"
   }
 
   depends_on = ["aws_alb.instance"]

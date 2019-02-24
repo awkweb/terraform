@@ -14,14 +14,13 @@ resource "aws_launch_configuration" "ecs" {
     "${aws_security_group.api.id}",
   ]
 
-  # "${aws_security_group.db_access.id}",
-
   key_name = "${aws_key_pair.instance.key_name}"
+
   lifecycle {
     create_before_destroy = true
   }
-  # depends_on = ["aws_s3_bucket.ecs"]
-  depends_on = ["aws_instance.bastion"]
+
+  depends_on = ["aws_s3_bucket.ecs", "aws_instance.bastion"]
 }
 
 resource "aws_autoscaling_group" "ecs" {
