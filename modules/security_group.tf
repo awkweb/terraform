@@ -54,11 +54,12 @@ resource "aws_security_group" "api" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # ALB access to dynamic ports
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    protocol        = "tcp"
+    from_port       = 32768
+    to_port         = 65535
+    security_groups = ["${aws_security_group.alb.id}"]
   }
 
   egress {
