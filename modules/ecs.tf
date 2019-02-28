@@ -5,11 +5,6 @@ resource "aws_ecs_cluster" "instance" {
 resource "aws_ecs_task_definition" "api" {
   family                = "${var.name}-${var.env}-api"
   container_definitions = "${data.template_file.api_container_definition.rendered}"
-
-  volume {
-    name      = "nginx_conf"
-    host_path = "/nginx.conf"
-  }
 }
 
 resource "aws_ecs_service" "api" {

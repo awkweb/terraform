@@ -8,9 +8,9 @@
     "essential": true,
     "portMappings": [
       {
+        "containerPort": 8000,
         "hostPort": 0,
-        "protocol": "tcp",
-        "containerPort": 8000
+        "protocol": "tcp"
       }
     ],
     "environment": [
@@ -70,7 +70,8 @@
   },
   {
     "name": "nginx",
-    "image": "nginx:alpine",
+    "image": "${nginx_image}",
+    "entryPoint": ["bash", "./docker-entrypoint.sh"],
     "cpu": 100,
     "memory": 100,
     "essential": true,
@@ -78,13 +79,6 @@
       {
         "containerPort": 80,
         "hostPort": 0
-      }
-    ],
-    "mountPoints": [
-      {
-        "sourceVolume": "nginx_conf",
-        "containerPath": "/etc/nginx/nginx.conf",
-        "readOnly": false
       }
     ],
     "logConfiguration": {
