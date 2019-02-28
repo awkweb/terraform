@@ -35,6 +35,12 @@ resource "aws_autoscaling_group" "ecs" {
   lifecycle {
     create_before_destroy = true
   }
+
+  tags {
+    key                 = "Name"
+    value               = "${var.name}-${var.env}-container-instance"
+    propagate_at_launch = true
+  }
 }
 
 resource "aws_instance" "bastion" {
