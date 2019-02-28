@@ -11,6 +11,7 @@ resource "aws_launch_configuration" "ecs" {
   user_data            = "${data.template_file.user_data_ecs.rendered}"
 
   security_groups = [
+    "${aws_security_group.db_access.id}",
     "${aws_security_group.api.id}",
   ]
 
