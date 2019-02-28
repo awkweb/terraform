@@ -1,18 +1,18 @@
 resource "aws_alb" "instance" {
-  name            = "${var.name}-alb"
+  name            = "${var.name}-${var.env}-alb"
   internal        = false
   security_groups = ["${aws_security_group.alb.id}"]
   subnets         = ["${aws_subnet.public.*.id}"]
 }
 
 resource "aws_alb_target_group" "instance" {
-  name     = "${var.name}-tg"
+  name     = "${var.name}-${var.env}-tg"
   port     = 80
   protocol = "HTTP"
   vpc_id   = "${aws_vpc.instance.id}"
 
   health_check {
-    path = "/"
+    path = "/v1/"
   }
 
   depends_on = ["aws_alb.instance"]

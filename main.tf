@@ -15,4 +15,10 @@ module "app" {
   database_name     = "${var.database_name}"
   database_username = "${var.database_username}"
   database_password = "${var.database_password}"
+  django_env        = "${var.django_env}"
+  django_secret_key = "${var.django_secret_key}"
+  plaid_client_id   = "${var.plaid_client_id}"
+  plaid_public_key  = "${var.plaid_public_key}"
+  plaid_secret      = "${var.plaid_secret}"
+  plaid_env         = "${var.plaid_env}"
 }

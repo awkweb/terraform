@@ -1,14 +1,15 @@
-resource "aws_cloudwatch_log_group" "instance" {
-  name = "wilbur"
-}
-
 resource "aws_ecs_cluster" "instance" {
-  name = "${var.name}"
+  name = "${var.name}-${var.env}"
 }
 
 resource "aws_ecs_task_definition" "api" {
-  family                = "${var.name}-api"
+  family                = "${var.name}-${var.env}-api"
   container_definitions = "${data.template_file.api_container_definition.rendered}"
+
+  volume {
+    name      = "nginx_conf"
+    host_path = "/nginx.conf"
+  }
 }
 
 resource "aws_ecs_service" "api" {
@@ -24,4 +25,53 @@ resource "aws_ecs_service" "api" {
     container_name   = "nginx"
     container_port   = 80
   }
+}
+
+resource "aws_appautoscaling_target" "instance" {
+  service_namespace  = "ecs"
+  resource_id        = "service/${aws_ecs_cluster.instance.name}/${aws_ecs_service.api.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  role_arn           = "${aws_iam_role.autoscale.arn}"
+  min_capacity       = 2
+  max_capacity       = 4
+}
+
+resource "aws_appautoscaling_policy" "up" {
+  name               = "${var.name}-${var.env}-scale-up"
+  service_namespace  = "${aws_appautoscaling_target.instance.service_namespace}"
+  resource_id        = "service/${aws_ecs_cluster.instance.name}/${aws_ecs_service.api.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+
+  step_scaling_policy_configuration {
+    adjustment_type         = "ChangeInCapacity"
+    cooldown                = 60
+    metric_aggregation_type = "Maximum"
+
+    step_adjustment {
+      metric_interval_lower_bound = 0
+      scaling_adjustment          = 1
+    }
+  }
+
+  depends_on = ["aws_appautoscaling_target.instance"]
+}
+
+resource "aws_appautoscaling_policy" "down" {
+  name               = "${var.name}-${var.env}-scale-down"
+  service_namespace  = "${aws_appautoscaling_target.instance.service_namespace}"
+  resource_id        = "service/${aws_ecs_cluster.instance.name}/${aws_ecs_service.api.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+
+  step_scaling_policy_configuration {
+    adjustment_type         = "ChangeInCapacity"
+    cooldown                = 60
+    metric_aggregation_type = "Maximum"
+
+    step_adjustment {
+      metric_interval_lower_bound = 0
+      scaling_adjustment          = -1
+    }
+  }
+
+  depends_on = ["aws_appautoscaling_target.instance"]
 }
