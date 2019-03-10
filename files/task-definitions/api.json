@@ -43,6 +43,10 @@
         "value": "${django_secret_key}"
       },
       {
+        "name": "DJANGO_STATIC_URL",
+        "value": "${django_static_url}"
+      },
+      {
         "name": "PLAID_CLIENT_ID",
         "value": "${plaid_client_id}"
       },
