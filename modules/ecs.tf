@@ -7,10 +7,10 @@ resource "aws_ecs_task_definition" "api" {
   container_definitions = "${data.template_file.api_container_definition.rendered}"
 }
 
-# resource "aws_ecs_task_definition" "db_migrate" {
-#   family                = "${var.name}-${var.env}-db-migrate"
-#   container_definitions = "${data.template_file.db_migrate_container_definition.rendered}"
-# }
+resource "aws_ecs_task_definition" "db_migrate" {
+  family                = "${var.name}-${var.env}-db-migrate"
+  container_definitions = "${data.template_file.db_migrate_container_definition.rendered}"
+}
 
 resource "aws_ecs_service" "api" {
   name                               = "api"
@@ -27,13 +27,11 @@ resource "aws_ecs_service" "api" {
   }
 }
 
-# resource "aws_ecs_service" "db_migrate" {
-#   name            = "db-migrate"
-#   cluster         = "${aws_ecs_cluster.instance.id}"
-#   task_definition = "${aws_ecs_task_definition.db_migrate.arn}"
-#   desired_count   = 1
-#   iam_role        = "${aws_iam_role.ecs.name}"
-# }
+resource "aws_ecs_service" "db_migrate" {
+  name            = "db-migrate"
+  cluster         = "${aws_ecs_cluster.instance.id}"
+  task_definition = "${aws_ecs_task_definition.db_migrate.arn}"
+}
 
 resource "aws_appautoscaling_target" "instance" {
   service_namespace  = "ecs"

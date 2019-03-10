@@ -41,6 +41,26 @@
       {
         "name": "DJANGO_SECRET_KEY",
         "value": "${django_secret_key}"
+      },
+      {
+        "name": "DJANGO_STATIC_URL",
+        "value": "${django_static_url}"
+      },
+      {
+        "name": "PLAID_CLIENT_ID",
+        "value": "${plaid_client_id}"
+      },
+      {
+        "name": "PLAID_PUBLIC_KEY",
+        "value": "${plaid_public_key}"
+      },
+      {
+        "name": "PLAID_SECRET",
+        "value": "${plaid_secret}"
+      },
+      {
+        "name": "PLAID_ENV",
+        "value": "${plaid_env}"
       }
     ],
     "logConfiguration": {
