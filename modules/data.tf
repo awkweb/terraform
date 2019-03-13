@@ -1,5 +1,5 @@
 data "aws_acm_certificate" "instance" {
-  domain = "*.wilbur.app"
+  domain = "${var.route53_zone}"
 }
 
 data "aws_ami" "ecs_optimized" {
@@ -22,40 +22,6 @@ data "aws_ami" "bastion" {
   }
 
   owners = ["amazon"]
-}
-
-data "aws_iam_policy_document" "origin" {
-  statement {
-    actions   = ["s3:GetObject"]
-    resources = ["arn:aws:s3:::${var.name}.${var.env}.api/*"]
-
-    principals {
-      type        = "AWS"
-      identifiers = ["${aws_cloudfront_origin_access_identity.api.iam_arn}"]
-    }
-  }
-
-  statement {
-    actions   = ["s3:ListBucket"]
-    resources = ["arn:aws:s3:::${var.name}.${var.env}.api"]
-
-    principals {
-      type        = "AWS"
-      identifiers = ["${aws_cloudfront_origin_access_identity.api.iam_arn}"]
-    }
-  }
-}
-
-data "aws_ecr_repository" "api" {
-  name = "${var.name}-${var.env}/api"
-}
-
-data "aws_ecr_repository" "nginx" {
-  name = "${var.name}-${var.env}/nginx"
-}
-
-data "aws_route53_zone" "instance" {
-  name = "wilbur.app."
 }
 
 data "external" "api_image" {

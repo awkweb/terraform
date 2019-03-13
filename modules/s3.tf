@@ -6,5 +6,21 @@ resource "aws_s3_bucket" "api" {
 
 resource "aws_s3_bucket_policy" "api" {
   bucket = "${aws_s3_bucket.api.id}"
-  policy = "${data.aws_iam_policy_document.origin.json}"
+  policy = "${data.aws_iam_policy_document.api_origin.json}"
+}
+
+resource "aws_s3_bucket" "web" {
+  acl           = "private"
+  bucket        = "${var.name}.${var.env}.web"
+  force_destroy = true
+
+  website {
+    index_document = "index.html"
+    error_document = "index.html"
+  }
+}
+
+resource "aws_s3_bucket_policy" "web" {
+  bucket = "${aws_s3_bucket.web.id}"
+  policy = "${data.aws_iam_policy_document.web_origin.json}"
 }
