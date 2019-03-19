@@ -115,7 +115,7 @@ data "aws_iam_policy_document" "web_origin" {
 
     principals {
       type        = "AWS"
-      identifiers = ["${aws_cloudfront_origin_access_identity.api.iam_arn}"]
+      identifiers = ["${aws_cloudfront_origin_access_identity.web.iam_arn}"]
     }
   }
 
@@ -125,7 +125,7 @@ data "aws_iam_policy_document" "web_origin" {
 
     principals {
       type        = "AWS"
-      identifiers = ["${aws_cloudfront_origin_access_identity.api.iam_arn}"]
+      identifiers = ["${aws_cloudfront_origin_access_identity.web.iam_arn}"]
     }
   }
 }

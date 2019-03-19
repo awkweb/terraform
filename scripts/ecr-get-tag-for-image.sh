@@ -13,9 +13,9 @@ eval "$(jq -r '@sh "REPOSITORY_NAME=\(.repository_name)"')"
 # Get most recent image
 # Based on https://www.timcosta.io/aws-cli-get-most-recent-image-in-ecr/
 TAG="$(aws ecr describe-images \
---repository-name ${REPOSITORY_NAME} \
---output text \
---query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[*]' \
+    --repository-name ${REPOSITORY_NAME} \
+    --output text \
+    --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[*]' \
 | tr '\t' '\n' \
 | tail -1)"
 
