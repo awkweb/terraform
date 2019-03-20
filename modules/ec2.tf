@@ -1,6 +1,6 @@
 resource "aws_key_pair" "instance" {
   key_name   = "${var.name}-${var.env}"
-  public_key = "${file("wilbur.pub")}"
+  public_key = "${file("butter.pub")}"
 }
 
 resource "aws_launch_configuration" "ecs" {
@@ -58,13 +58,13 @@ resource "aws_instance" "bastion" {
   }
 
   provisioner "file" {
-    source      = "wilbur.pem"
-    destination = "/home/ec2-user/.ssh/wilbur.pem"
+    source      = "butter.pem"
+    destination = "/home/ec2-user/.ssh/butter.pem"
 
     connection {
       type        = "ssh"
       user        = "ec2-user"
-      private_key = "${file("wilbur.pem")}"
+      private_key = "${file("butter.pem")}"
       timeout     = "5m"
     }
   }
@@ -77,7 +77,7 @@ resource "aws_instance" "bastion" {
     connection {
       type        = "ssh"
       user        = "ec2-user"
-      private_key = "${file("wilbur.pem")}"
+      private_key = "${file("butter.pem")}"
     }
   }
 }

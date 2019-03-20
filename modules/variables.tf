@@ -15,6 +15,10 @@ variable "availability_zones" {
   default = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 
+variable "domain_name" {
+  default = "butter.so"
+}
+
 variable "env" {
   default = "prod"
 }
@@ -46,7 +50,7 @@ variable "instance_type" {
 }
 
 variable "name" {
-  default = "wilbur"
+  default = "butter"
 }
 
 variable "plaid_client_id" {}
@@ -69,10 +73,6 @@ variable "private_subnets_cidr" {
 
 variable "region" {
   default = "us-east-1"
-}
-
-variable "route53_zone" {
-  default = "wilbur.app"
 }
 
 variable "vpc_cidr" {

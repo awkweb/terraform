@@ -12,13 +12,13 @@ resource "aws_cloudfront_distribution" "api_assets" {
     }
   }
 
-  aliases = ["api-assets.${var.route53_zone}"]
+  aliases = ["api-assets.${var.domain_name}"]
 
   enabled = true
   comment = "${var.name} ${var.env} api assets"
 
   viewer_certificate {
-    acm_certificate_arn = "${data.aws_acm_certificate.instance.arn}"
+    acm_certificate_arn = "${aws_acm_certificate.instance.arn}"
     ssl_support_method  = "sni-only"
   }
 
@@ -35,6 +35,7 @@ resource "aws_cloudfront_distribution" "api_assets" {
 
     forwarded_values {
       query_string = true
+      headers      = ["Access-Control-Request-Headers", "Access-Control-Request-Method", "Origin"]
 
       cookies {
         forward = "none"
@@ -62,7 +63,7 @@ resource "aws_cloudfront_distribution" "www" {
     }
   }
 
-  aliases = ["www.${var.route53_zone}"]
+  aliases = ["${var.domain_name}"]
 
   enabled             = true
   is_ipv6_enabled     = true
@@ -95,7 +96,7 @@ resource "aws_cloudfront_distribution" "www" {
   }
 
   viewer_certificate {
-    acm_certificate_arn = "${data.aws_acm_certificate.instance.arn}"
+    acm_certificate_arn = "${aws_acm_certificate.instance.arn}"
     ssl_support_method  = "sni-only"
   }
 
@@ -111,56 +112,5 @@ resource "aws_cloudfront_distribution" "www" {
     error_code            = 403
     response_code         = 200
     response_page_path    = "/index.html"
-  }
-}
-
-resource "aws_cloudfront_origin_access_identity" "www_redirect" {
-  comment = "Origin access identity for ${var.name} ${var.env} www redirect"
-}
-
-resource "aws_cloudfront_distribution" "www_redirect" {
-  origin {
-    domain_name = "${aws_s3_bucket.www_redirect.bucket_regional_domain_name}"
-    origin_id   = "${var.name}_${var.env}_www_redirect"
-
-    s3_origin_config {
-      origin_access_identity = "${aws_cloudfront_origin_access_identity.www_redirect.cloudfront_access_identity_path}"
-    }
-  }
-
-  aliases = ["${var.route53_zone}"]
-
-  enabled         = true
-  is_ipv6_enabled = true
-  comment         = "${var.name} ${var.env} www redirect"
-
-  default_cache_behavior {
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "${var.name}_${var.env}_www_redirect"
-
-    forwarded_values {
-      query_string = true
-
-      cookies {
-        forward = "none"
-      }
-    }
-
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
-  }
-
-  restrictions {
-    geo_restriction {
-      restriction_type = "none"
-    }
-  }
-
-  viewer_certificate {
-    acm_certificate_arn = "${data.aws_acm_certificate.instance.arn}"
-    ssl_support_method  = "sni-only"
   }
 }

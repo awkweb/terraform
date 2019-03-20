@@ -4,5 +4,5 @@ terraform.tfstate
 *.tfstate*
 terraform.tfvars
 terraform.tfstate
-wilbur.pem
-wilbur.pub
+butter.pem
+butter.pub

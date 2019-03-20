@@ -2,6 +2,10 @@ variable "aws_access_key" {}
 
 variable "aws_secret_key" {}
 
+variable "cloudflare_email" {}
+
+variable "cloudflare_token" {}
+
 variable "database_name" {}
 
 variable "database_password" {}

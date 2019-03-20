@@ -2,6 +2,14 @@ resource "aws_s3_bucket" "api_assets" {
   acl           = "private"
   bucket        = "${var.name}.${var.env}.api-assets"
   force_destroy = true
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET"]
+    allowed_origins = ["https://api.${var.domain_name}"]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3600
+  }
 }
 
 resource "aws_s3_bucket_policy" "api" {
@@ -23,19 +31,4 @@ resource "aws_s3_bucket" "www" {
 resource "aws_s3_bucket_policy" "www" {
   bucket = "${aws_s3_bucket.www.id}"
   policy = "${data.template_file.www_origin.rendered}"
-}
-
-resource "aws_s3_bucket" "www_redirect" {
-  acl           = "public-read"
-  bucket        = "${var.name}.${var.env}.www-redirect"
-  force_destroy = true
-
-  website {
-    redirect_all_requests_to = "https://${var.route53_zone}"
-  }
-}
-
-resource "aws_s3_bucket_policy" "www_redirect" {
-  bucket = "${aws_s3_bucket.www_redirect.id}"
-  policy = "${data.template_file.www_redirect_origin.rendered}"
 }

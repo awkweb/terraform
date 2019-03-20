@@ -1,7 +1,3 @@
-data "aws_acm_certificate" "instance" {
-  domain = "${var.route53_zone}"
-}
-
 data "aws_ami" "ecs_optimized" {
   most_recent = true
 
@@ -75,7 +71,7 @@ data "template_file" "api_container_definition" {
     database_username = "${var.database_username}"
     django_env        = "${var.django_env}"
     django_secret_key = "${var.django_secret_key}"
-    django_static_url = "https://api-assets.${var.route53_zone}/"
+    django_static_url = "https://${cloudflare_record.api_assets.hostname}/"
     log_group         = "${aws_cloudwatch_log_group.instance.name}"
     plaid_client_id   = "${var.plaid_client_id}"
     plaid_env         = "${var.plaid_env}"
@@ -83,8 +79,6 @@ data "template_file" "api_container_definition" {
     plaid_secret      = "${var.plaid_secret}"
     region            = "${var.region}"
   }
-
-  depends_on = ["aws_route53_record.api_assets"]
 }
 
 data "template_file" "db_migrate_container_definition" {
@@ -99,7 +93,7 @@ data "template_file" "db_migrate_container_definition" {
     database_username = "${var.database_username}"
     django_env        = "${var.django_env}"
     django_secret_key = "${var.django_secret_key}"
-    django_static_url = "https://api-assets.${var.route53_zone}/"
+    django_static_url = "https://${cloudflare_record.api_assets.hostname}/"
     log_group         = "${aws_cloudwatch_log_group.instance.name}"
     plaid_client_id   = "${var.plaid_client_id}"
     plaid_env         = "${var.plaid_env}"
@@ -107,8 +101,6 @@ data "template_file" "db_migrate_container_definition" {
     plaid_secret      = "${var.plaid_secret}"
     region            = "${var.region}"
   }
-
-  depends_on = ["aws_route53_record.api_assets"]
 }
 
 data "template_file" "user_data_bastion" {
@@ -138,14 +130,5 @@ data "template_file" "www_origin" {
   vars {
     cloudfront_iam_arn = "${aws_cloudfront_origin_access_identity.www.iam_arn}"
     s3_bucket_arn      = "${aws_s3_bucket.www.arn}"
-  }
-}
-
-data "template_file" "www_redirect_origin" {
-  template = "${data.aws_iam_policy_document.origin.json}"
-
-  vars {
-    cloudfront_iam_arn = "${aws_cloudfront_origin_access_identity.www_redirect.iam_arn}"
-    s3_bucket_arn      = "${aws_s3_bucket.www_redirect.arn}"
   }
 }
