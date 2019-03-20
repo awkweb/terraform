@@ -14,26 +14,38 @@ resource "aws_route53_record" "api" {
   }
 }
 
-resource "aws_route53_record" "web" {
+resource "aws_route53_record" "api_assets" {
   zone_id = "${data.aws_route53_zone.instance.zone_id}"
-  name    = "${var.route53_zone}"
+  name    = "api-assets.${var.route53_zone}"
   type    = "A"
 
   alias {
-    name                   = "${aws_cloudfront_distribution.web.domain_name}"
-    zone_id                = "${aws_cloudfront_distribution.web.hosted_zone_id}"
+    name                   = "${aws_cloudfront_distribution.api_assets.domain_name}"
+    zone_id                = "${aws_cloudfront_distribution.api_assets.hosted_zone_id}"
     evaluate_target_health = false
   }
 }
 
-resource "aws_route53_record" "web_redirect" {
+resource "aws_route53_record" "www" {
   zone_id = "${data.aws_route53_zone.instance.zone_id}"
   name    = "www.${var.route53_zone}"
   type    = "A"
 
   alias {
-    name                   = "${aws_cloudfront_distribution.web_redirect.domain_name}"
-    zone_id                = "${aws_cloudfront_distribution.web_redirect.hosted_zone_id}"
+    name                   = "${aws_cloudfront_distribution.www.domain_name}"
+    zone_id                = "${aws_cloudfront_distribution.www.hosted_zone_id}"
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "www_redirect" {
+  zone_id = "${data.aws_route53_zone.instance.zone_id}"
+  name    = "${var.route53_zone}"
+  type    = "A"
+
+  alias {
+    name                   = "${aws_cloudfront_distribution.www_redirect.domain_name}"
+    zone_id                = "${aws_cloudfront_distribution.www_redirect.hosted_zone_id}"
     evaluate_target_health = false
   }
 }

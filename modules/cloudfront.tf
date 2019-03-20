@@ -1,16 +1,18 @@
-resource "aws_cloudfront_origin_access_identity" "api" {
-  comment = "Origin access identity for ${var.name} ${var.env} api"
+resource "aws_cloudfront_origin_access_identity" "api_assets" {
+  comment = "Origin access identity for ${var.name} ${var.env} api assets"
 }
 
-resource "aws_cloudfront_distribution" "api" {
+resource "aws_cloudfront_distribution" "api_assets" {
   origin {
-    domain_name = "${aws_s3_bucket.api.bucket_regional_domain_name}"
-    origin_id   = "${var.name}_${var.env}_api"
+    domain_name = "${aws_s3_bucket.api_assets.bucket_regional_domain_name}"
+    origin_id   = "${var.name}_${var.env}_api_assets"
 
     s3_origin_config {
-      origin_access_identity = "${aws_cloudfront_origin_access_identity.api.cloudfront_access_identity_path}"
+      origin_access_identity = "${aws_cloudfront_origin_access_identity.api_assets.cloudfront_access_identity_path}"
     }
   }
+
+  aliases = ["api-assets.${var.route53_zone}"]
 
   enabled = true
   comment = "${var.name} ${var.env} api assets"
@@ -29,7 +31,7 @@ resource "aws_cloudfront_distribution" "api" {
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "${var.name}_${var.env}_api"
+    target_origin_id = "${var.name}_${var.env}_api_assets"
 
     forwarded_values {
       query_string = true
@@ -46,31 +48,31 @@ resource "aws_cloudfront_distribution" "api" {
   }
 }
 
-resource "aws_cloudfront_origin_access_identity" "web" {
-  comment = "Origin access identity for ${var.name} ${var.env} web"
+resource "aws_cloudfront_origin_access_identity" "www" {
+  comment = "Origin access identity for ${var.name} ${var.env} www"
 }
 
-resource "aws_cloudfront_distribution" "web" {
+resource "aws_cloudfront_distribution" "www" {
   origin {
-    domain_name = "${aws_s3_bucket.web.bucket_regional_domain_name}"
-    origin_id   = "${var.name}_${var.env}_web"
+    domain_name = "${aws_s3_bucket.www.bucket_regional_domain_name}"
+    origin_id   = "${var.name}_${var.env}_www"
 
     s3_origin_config {
-      origin_access_identity = "${aws_cloudfront_origin_access_identity.web.cloudfront_access_identity_path}"
+      origin_access_identity = "${aws_cloudfront_origin_access_identity.www.cloudfront_access_identity_path}"
     }
   }
 
-  aliases = ["${var.route53_zone}"]
+  aliases = ["www.${var.route53_zone}"]
 
   enabled             = true
   is_ipv6_enabled     = true
-  comment             = "${var.name} ${var.env} web"
+  comment             = "${var.name} ${var.env} www"
   default_root_object = "index.html"
 
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "${var.name}_${var.env}_web"
+    target_origin_id = "${var.name}_${var.env}_www"
 
     forwarded_values {
       query_string = true
@@ -112,30 +114,30 @@ resource "aws_cloudfront_distribution" "web" {
   }
 }
 
-resource "aws_cloudfront_origin_access_identity" "web_redirect" {
-  comment = "Origin access identity for ${var.name} ${var.env} web redirect"
+resource "aws_cloudfront_origin_access_identity" "www_redirect" {
+  comment = "Origin access identity for ${var.name} ${var.env} www redirect"
 }
 
-resource "aws_cloudfront_distribution" "web_redirect" {
+resource "aws_cloudfront_distribution" "www_redirect" {
   origin {
-    domain_name = "${aws_s3_bucket.web_redirect.bucket_regional_domain_name}"
-    origin_id   = "${var.name}_${var.env}_web_redirect"
+    domain_name = "${aws_s3_bucket.www_redirect.bucket_regional_domain_name}"
+    origin_id   = "${var.name}_${var.env}_www_redirect"
 
     s3_origin_config {
-      origin_access_identity = "${aws_cloudfront_origin_access_identity.web_redirect.cloudfront_access_identity_path}"
+      origin_access_identity = "${aws_cloudfront_origin_access_identity.www_redirect.cloudfront_access_identity_path}"
     }
   }
 
-  aliases = ["www.${var.route53_zone}"]
+  aliases = ["${var.route53_zone}"]
 
   enabled         = true
   is_ipv6_enabled = true
-  comment         = "${var.name} ${var.env} web redirect"
+  comment         = "${var.name} ${var.env} www redirect"
 
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "${var.name}_${var.env}_web_redirect"
+    target_origin_id = "${var.name}_${var.env}_www_redirect"
 
     forwarded_values {
       query_string = true

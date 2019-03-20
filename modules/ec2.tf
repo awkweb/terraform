@@ -21,7 +21,7 @@ resource "aws_launch_configuration" "ecs" {
     create_before_destroy = true
   }
 
-  depends_on = ["aws_s3_bucket.api", "aws_instance.bastion"]
+  depends_on = ["aws_s3_bucket.api_assets", "aws_instance.bastion"]
 }
 
 resource "aws_autoscaling_group" "ecs" {

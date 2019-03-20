@@ -1,17 +1,17 @@
-resource "aws_s3_bucket" "api" {
+resource "aws_s3_bucket" "api_assets" {
   acl           = "private"
-  bucket        = "${var.name}.${var.env}.api"
+  bucket        = "${var.name}.${var.env}.api-assets"
   force_destroy = true
 }
 
 resource "aws_s3_bucket_policy" "api" {
-  bucket = "${aws_s3_bucket.api.id}"
-  policy = "${data.aws_iam_policy_document.api_origin.json}"
+  bucket = "${aws_s3_bucket.api_assets.id}"
+  policy = "${data.template_file.api_assets_origin.rendered}"
 }
 
-resource "aws_s3_bucket" "web" {
+resource "aws_s3_bucket" "www" {
   acl           = "private"
-  bucket        = "${var.name}.${var.env}.web"
+  bucket        = "${var.name}.${var.env}.www"
   force_destroy = true
 
   website {
@@ -20,17 +20,22 @@ resource "aws_s3_bucket" "web" {
   }
 }
 
-resource "aws_s3_bucket_policy" "web" {
-  bucket = "${aws_s3_bucket.web.id}"
-  policy = "${data.aws_iam_policy_document.web_origin.json}"
+resource "aws_s3_bucket_policy" "www" {
+  bucket = "${aws_s3_bucket.www.id}"
+  policy = "${data.template_file.www_origin.rendered}"
 }
 
-resource "aws_s3_bucket" "web_redirect" {
+resource "aws_s3_bucket" "www_redirect" {
   acl           = "public-read"
-  bucket        = "${var.name}.${var.env}.web-redirect"
+  bucket        = "${var.name}.${var.env}.www-redirect"
   force_destroy = true
 
   website {
     redirect_all_requests_to = "https://${var.route53_zone}"
   }
+}
+
+resource "aws_s3_bucket_policy" "www_redirect" {
+  bucket = "${aws_s3_bucket.www_redirect.id}"
+  policy = "${data.template_file.www_redirect_origin.rendered}"
 }
