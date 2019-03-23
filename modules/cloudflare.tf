@@ -9,32 +9,30 @@ resource "cloudflare_record" "api" {
   domain = "${var.domain_name}"
   name   = "api"
   value  = "${aws_alb.instance.dns_name}"
-  type   = "A"
+  type   = "CNAME"
 }
 
 resource "cloudflare_record" "api_assets" {
   domain = "${var.domain_name}"
   name   = "api-assets"
   value  = "${aws_cloudfront_distribution.api_assets.domain_name}"
-  type   = "A"
+  type   = "CNAME"
 }
 
 resource "cloudflare_record" "www" {
   domain = "${var.domain_name}"
-  name   = "${var.domain_name}"
+  name   = "www"
   value  = "${aws_cloudfront_distribution.www.domain_name}"
-  type   = "A"
+  type   = "CNAME"
+
+  proxied = false
 }
 
-resource "cloudflare_page_rule" "www_redirect" {
-  zone     = "${var.domain_name}"
-  target   = "www.${var.domain_name}/*"
-  priority = 1
+resource "cloudflare_record" "www_redirect" {
+  domain = "${var.domain_name}"
+  name   = "${var.domain_name}"
+  value  = "${aws_cloudfront_distribution.www_redirect.domain_name}"
+  type   = "CNAME"
 
-  actions = {
-    forwarding_url = {
-      url         = "https://${var.domain_name}/$1"
-      status_code = 301
-    }
-  }
+  proxied = false
 }

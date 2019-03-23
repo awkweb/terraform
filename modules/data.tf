@@ -132,3 +132,12 @@ data "template_file" "www_origin" {
     s3_bucket_arn      = "${aws_s3_bucket.www.arn}"
   }
 }
+
+data "template_file" "www_redirect_origin" {
+  template = "${data.aws_iam_policy_document.origin.json}"
+
+  vars {
+    cloudfront_iam_arn = "${aws_cloudfront_origin_access_identity.www_redirect.iam_arn}"
+    s3_bucket_arn      = "${aws_s3_bucket.www_redirect.arn}"
+  }
+}

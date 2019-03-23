@@ -7,7 +7,7 @@ resource "aws_acm_certificate" "instance" {
   ]
 }
 
-resource "aws_acm_certificate_validation" "cert" {
+resource "aws_acm_certificate_validation" "instance" {
   certificate_arn         = "${aws_acm_certificate.instance.arn}"
   validation_record_fqdns = ["${cloudflare_record.acm.hostname}"]
 }
