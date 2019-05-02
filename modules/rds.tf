@@ -8,7 +8,7 @@ resource "aws_db_instance" "instance" {
   identifier                = "${var.name}-${var.env}"
   allocated_storage         = "${var.database_allocated_storage}"
   engine                    = "postgres"
-  engine_version            = "9.6.9"
+  engine_version            = "9.6.11"
   instance_class            = "${var.database_instance_class}"
   multi_az                  = "${var.database_multi_az}"
   name                      = "${var.database_name}"

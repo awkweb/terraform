@@ -19,9 +19,7 @@ variable "domain_name" {
   default = "butter.so"
 }
 
-variable "env" {
-  default = "prod"
-}
+variable "env" {}
 
 variable "database_name" {}
 
@@ -49,9 +47,7 @@ variable "instance_type" {
   default = "t2.micro"
 }
 
-variable "name" {
-  default = "butter"
-}
+variable "name" {}
 
 variable "plaid_client_id" {}
 
@@ -71,9 +67,7 @@ variable "private_subnets_cidr" {
   default = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
 }
 
-variable "region" {
-  default = "us-east-1"
-}
+variable "region" {}
 
 variable "vpc_cidr" {
   default = "10.0.0.0/16"

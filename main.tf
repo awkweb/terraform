@@ -1,7 +1,7 @@
 provider "aws" {
   access_key = "${var.aws_access_key}"
   secret_key = "${var.aws_secret_key}"
-  region     = "us-east-1"
+  region     = "${var.region}"
   version    = "1.59"
 }
 
@@ -27,8 +27,11 @@ module "app" {
   database_password = "${var.database_password}"
   django_env        = "${var.django_env}"
   django_secret_key = "${var.django_secret_key}"
+  env               = "${var.env}"
+  name              = "${var.name}"
   plaid_client_id   = "${var.plaid_client_id}"
   plaid_public_key  = "${var.plaid_public_key}"
   plaid_secret      = "${var.plaid_secret}"
   plaid_env         = "${var.plaid_env}"
+  region            = "${var.region}"
 }

@@ -82,42 +82,41 @@ resource "aws_instance" "bastion" {
   }
 }
 
-# resource "aws_ami_from_instance" "bastion" {
-#   name               = "ami-terraform-generated-bastion"
-#   source_instance_id = "${aws_instance.bastion.id}"
-# }
+resource "aws_ami_from_instance" "bastion" {
+  name               = "ami-terraform-generated-bastion"
+  source_instance_id = "${aws_instance.bastion.id}"
+}
 
+resource "aws_launch_configuration" "bastion" {
+  name          = "${var.name}-${var.env}-bastion-lc"
+  image_id      = "${aws_ami_from_instance.bastion.id}"
+  instance_type = "t2.nano"
+  user_data     = "${data.template_file.user_data_bastion.rendered}"
 
-# resource "aws_launch_configuration" "bastion" {
-#   name          = "${var.name}-${var.env}-bastion-lc"
-#   image_id      = "${aws_ami_from_instance.bastion.id}"
-#   instance_type = "t2.nano"
-#   user_data     = "${data.template_file.user_data_bastion.rendered}"
+  security_groups = ["${aws_security_group.bastion.id}"]
+  key_name        = "${aws_key_pair.instance.key_name}"
 
+  lifecycle {
+    create_before_destroy = true
+  }
+}
 
-#   security_groups = ["${aws_security_group.bastion.id}"]
-#   key_name        = "${aws_key_pair.instance.key_name}"
+resource "aws_autoscaling_group" "bastion" {
+  name                 = "${var.name}-${var.env}-bastion-asg"
+  launch_configuration = "${aws_launch_configuration.bastion.name}"
 
+  max_size            = "1"
+  min_size            = "1"
+  desired_capacity    = "1"
+  vpc_zone_identifier = ["${aws_subnet.public.*.id}"]
 
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
+  lifecycle {
+    create_before_destroy = true
+  }
 
-
-# resource "aws_autoscaling_group" "bastion" {
-#   name                 = "${var.name}-${var.env}-bastion-asg"
-#   launch_configuration = "${aws_launch_configuration.bastion.name}"
-
-
-#   max_size            = "1"
-#   min_size            = "1"
-#   desired_capacity    = "1"
-#   vpc_zone_identifier = ["${aws_subnet.public.*.id}"]
-
-
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
-
+  tags {
+    key                 = "Name"
+    value               = "${var.name}-${var.env}-bastion"
+    propagate_at_launch = true
+  }
+}

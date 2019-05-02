@@ -16,6 +16,14 @@ variable "django_env" {}
 
 variable "django_secret_key" {}
 
+variable "env" {
+  default = "prod"
+}
+
+variable "name" {
+  default = "butter"
+}
+
 variable "plaid_client_id" {}
 
 variable "plaid_env" {}
@@ -23,3 +31,7 @@ variable "plaid_env" {}
 variable "plaid_public_key" {}
 
 variable "plaid_secret" {}
+
+variable "region" {
+  default = "us-east-1"
+}

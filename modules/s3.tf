@@ -21,6 +21,11 @@ resource "aws_s3_bucket" "www" {
   acl           = "private"
   bucket        = "www.${var.domain_name}"
   force_destroy = true
+
+  website {
+    index_document = "index.html"
+    error_document = "index.html"
+  }
 }
 
 resource "aws_s3_bucket_policy" "www" {
